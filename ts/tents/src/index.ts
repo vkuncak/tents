@@ -25,7 +25,24 @@ function placeTrees() {
         [row + 1, col], // Below
         [row, col - 1], // Left
         [row, col + 1], // Right
-      ].filter(([r, c]) => r >= 0 && r < SIZE && c >= 0 && c < SIZE && matrix[r][c] === 0);
+      ].filter(([r, c]) => {
+        // Ensure the position is within bounds and empty
+        if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || matrix[r][c] !== 0) {
+          return false;
+        }
+
+        // Check the 8 adjacent cells around the potential tent position
+        const adjacentCells = [
+          [r - 1, c - 1], [r - 1, c], [r - 1, c + 1], // Top-left, Top, Top-right
+          [r, c - 1],                 [r, c + 1],     // Left, Right
+          [r + 1, c - 1], [r + 1, c], [r + 1, c + 1], // Bottom-left, Bottom, Bottom-right
+        ];
+
+        return adjacentCells.every(([adjR, adjC]) => {
+          // Ensure adjacent cells are within bounds and do not contain a tent
+          return adjR < 0 || adjR >= SIZE || adjC < 0 || adjC >= SIZE || matrix[adjR][adjC] !== 3;
+        });
+      });
 
       // If there is at least one valid position for a tent
       if (tentPositions.length > 0) {
