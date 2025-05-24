@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Matrix Puzzle</title>
+  <title>Tents</title>
   <style>
     /* simple grid styling */
     #matrix {
@@ -28,12 +28,31 @@
       text-align: center;
       line-height: 40px; /* Match the cell height */
       border: none; /* Crucial: Remove the border for totals */
-      /* Add any other shared styles for totals here */
+    }
+    .success-message {
+      font-size: 32px; /* Match the font size of the matrix entries */
+      font-weight: bold; /* Make the text bold */
+      color: green; /* Optional: Add a color to make it stand out */
+      text-align: center; /* Center the message */
+      margin-top: 20px; /* Add some spacing above the message */
     }
   </style>
 </head>
 <body>
+  <h1>Tents: Recreation of one of the Tatham's Puzzle Games for Android</h1>
+
   <div id="matrix"></div>
-  <script src="./dist/index.js" defer></script>
+  <script src="./dist/index.js" defer></script>  
+
+  <p>Click on a cell to toggle its state. The goal is to place tents around trees without violating the rules:</p>
+  <ul>
+  <li>Each tree must have exactly one tent adjacent to it (horizontally or vertically).</li>
+  <li>Tents cannot be adjacent to each other, even diagonally.</li>
+  <li>The number of tents in each row and column must match the given totals.</li>
+  <li>Empty cells can be left blank.</li>
+  </li>
+  </ul>
+
+</p>
 </body>
 </html>
