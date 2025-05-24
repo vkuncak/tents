@@ -80,6 +80,63 @@ function placeTrees(matrix: number[][]): void {
 }
 
 /**
+ * Compares two matrices for equality.
+ * @param matrix1 The first matrix to compare.
+ * @param matrix2 The second matrix to compare.
+ * @returns True if the matrices are equal, false otherwise.
+ */
+function areMatricesEqual(matrix1: number[][], matrix2: number[][]): boolean {
+  if (matrix1.length !== matrix2.length) return false;
+
+  for (let row = 0; row < matrix1.length; row++) {
+    if (matrix1[row].length !== matrix2[row].length) return false;
+
+    for (let col = 0; col < matrix1[row].length; col++) {
+      if (matrix1[row][col] !== matrix2[row][col]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Checks if the current matrix matches the solution matrix.
+ * Treats values 0 and 2 as equal.
+ * @param matrix The current matrix (globalMatrix).
+ * @param solutionMatrix The solution matrix.
+ * @returns True if the current matrix matches the solution matrix, false otherwise.
+ */
+function isCorrectSolution(matrix: number[][], solutionMatrix: number[][]): boolean {
+  if (matrix.length !== solutionMatrix.length) return false;
+
+  for (let row = 0; row < matrix.length; row++) {
+    if (matrix[row].length !== solutionMatrix[row].length) return false;
+
+    for (let col = 0; col < matrix[row].length; col++) {
+      const currentVal = matrix[row][col];
+      const solutionVal = solutionMatrix[row][col];
+
+      // Treat 0 and 2 as equal
+      if (
+        (currentVal === 0 || currentVal === 2) &&
+        (solutionVal === 0 || solutionVal === 2)
+      ) {
+        continue;
+      }
+
+      // Check for exact match for other values
+      if (currentVal !== solutionVal) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/**
  * Handles the click event for a cell.
  */
 function handleCellClick(matrix: number[][], row: number, col: number): void {
@@ -93,7 +150,13 @@ function handleCellClick(matrix: number[][], row: number, col: number): void {
   } else {
     return; // Do nothing for other values
   }
+
   drawMatrix(matrix, solutionMatrix); // Redraw the matrix after the change
+  // Check if the current globalMatrix matches the solutionMatrix
+  if (isCorrectSolution(matrix, solutionMatrix)) {
+    alert("Congratulations!"); // Display the success message
+  }
+
 }
 
 /**
