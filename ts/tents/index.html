@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Matrix Puzzle</title>
+  <style>
+    /* simple grid styling */
+    #matrix {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      gap: 2px;
+      margin: 20px;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: sans-serif;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="matrix"></div>
+  <script src="./dist/index.js" defer></script>
+</body>
+</html>
