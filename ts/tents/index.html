@@ -14,13 +14,21 @@
     .cell {
       width: 40px;
       height: 40px;
-      border: 1px solid #666;
+      border: 1px solid #666; /* Default border for cells */
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-family: sans-serif;
-      font-size: 32px; /* Adjusted from 16px for larger symbols */
+      font-size: 32px;
+    }
+    .row-total, .col-total {
+      font-size: 20px; /* Smaller than the cells */
+      font-weight: bold;
+      text-align: center;
+      line-height: 40px; /* Match the cell height */
+      border: none; /* Crucial: Remove the border for totals */
+      /* Add any other shared styles for totals here */
     }
   </style>
 </head>
