@@ -1,8 +1,8 @@
 // src/index.ts
 
-const SIZE = 10;
+const SIZE = 8;
 
-// 1. initialize a 10×10 matrix filled with zeros
+// 1. initialize a SIZE × SIZE matrix filled with zeros
 const matrix: number[][] = Array.from(
   { length: SIZE },
   () => Array(SIZE).fill(0)
@@ -13,12 +13,27 @@ function drawMatrix() {
   const container = document.getElementById('matrix')!;
   container.innerHTML = ''; // clear old
 
+  // Set the grid style dynamically based on SIZE
+  container.style.gridTemplateColumns = `repeat(${SIZE}, 40px)`; // Assuming 40px cell width as before
+
   for (let row = 0; row < SIZE; row++) {
     for (let col = 0; col < SIZE; col++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
       const val = matrix[row][col];
-      cell.textContent = val === 0 ? '' : String(val);
+
+      // Handle special cases for display
+      if (val === 0) {
+        cell.textContent = '';
+      } else if (val === 1) {
+        cell.textContent = '🌳'; // Deciduous Tree (rounded) Unicode character
+      } else if (val === 2) {
+        cell.textContent = '×'; // Multiplication Sign Unicode character
+      } else if (val === 3) {
+        cell.textContent = '⛺'; // Tent Unicode character
+      } else {
+        cell.textContent = String(val);
+      }
 
       // 3. on-click → prompt for new number, update and redraw
       cell.addEventListener('click', () => {
