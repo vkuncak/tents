@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Text Editor with browser-fs-access</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #controls { margin-bottom: 10px; }
+    #editor {
+      border: 1px solid #ccc;
+      padding: 10px;
+      min-height: 300px;
+      margin-top: 10px;
+      outline: none;
+      overflow: auto;
+    }
+    #filename { width: 200px; }
+    button { margin-right: 5px; }
+  </style>
+  <!-- DOMPurify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js" integrity="sha384-XFqoSYo8dO0w64+6D0yMqdiDZZu7AgWQ9iQ+zFG+G6lglp8E5ktqg5nV+6R8lZlp" crossorigin="anonymous"></script>
+</head>
+<body>
+  <h1>Rich Text Editor</h1>
+  <div id="controls">
+    <button id="openBtn">Open</button>
+    <button id="boldBtn"><b>B</b></button>
+    <label for="filename">Filename:</label>
+    <input type="text" id="filename" value="untitled.html" />
+    <button id="saveBtn">Save</button>
+    <span id="status" style="margin-left:10px;color:green;"></span>
+  </div>
+  <div id="editor" contenteditable="true" placeholder="Type your rich text here..."></div>
+
+  <script type="module">
+    import { fileOpen, fileSave } from 'https://cdn.jsdelivr.net/npm/browser-fs-access/dist/index.mjs';
+
+    const openBtn = document.getElementById('openBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const boldBtn = document.getElementById('boldBtn');
+    const filenameInput = document.getElementById('filename');
+    const editor = document.getElementById('editor');
+    const statusEl = document.getElementById('status');
+
+    let fileHandle;
+    let lastSavedContent = '';
+    let lastSavedFilename = '';
+
+    // Clear handle if filename changed manually
+    filenameInput.addEventListener('input', () => {
+      fileHandle = null;
+      lastSavedFilename = '';
+    });
+
+    // Bold formatting
+    boldBtn.addEventListener('click', () => {
+      document.execCommand('bold', false, null);
+      editor.focus();
+    });
+
+    // Open file
+    openBtn.addEventListener('click', async () => {
+      try {
+        fileHandle = await fileOpen({
+          mode: 'readwrite',
+          description: 'HTML Files',
+          extensions: ['.html', '.htm'],
+          mimeTypes: ['text/html']
+        });
+        const file = await fileHandle.getFile();
+        const raw = await file.text();
+        const content = DOMPurify.sanitize(raw);
+        editor.innerHTML = content;
+        filenameInput.value = fileHandle.name;
+        lastSavedContent = content;
+        lastSavedFilename = fileHandle.name;
+      } catch (err) {
+        console.error('Open failed:', err);
+      }
+    });
+
+    // Save file
+    saveBtn.addEventListener('click', async () => {
+      const content = editor.innerHTML;
+      const suggested = filenameInput.value.trim() || 'untitled.html';
+      if (content === lastSavedContent && suggested === lastSavedFilename) {
+        return;
+      }
+      try {
+        if (fileHandle) {
+          await fileSave(content, { fileHandle });
+        } else {
+          fileHandle = await fileSave(content, {
+            fileName: suggested,
+            description: 'HTML Files',
+            extensions: ['.html', '.htm'],
+            mimeTypes: ['text/html']
+          });
+          filenameInput.value = fileHandle.name;
+        }
+        lastSavedContent = content;
+        lastSavedFilename = filenameInput.value;
+        showStatus('Saved at ' + new Date().toLocaleTimeString());
+      } catch (err) {
+        console.error('Save failed:', err);
+        showStatus('Save failed', true);
+      }
+    });
+
+    function showStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.style.color = isError ? 'red' : 'green';
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    }
+
+    // Autosave every 10 seconds
+    setInterval(() => saveBtn.click(), 10000);
+  </script>
+</body>
+</html>

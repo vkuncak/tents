@@ -30,9 +30,15 @@
     let lastSavedText = '';
     let lastSavedFilename = '';
 
+    // If user manually changes the input, clear handle so Save As dialog reopens
+    filenameInput.addEventListener('input', () => {
+      fileHandle = null;
+      lastSavedFilename = '';
+    });
+
     async function saveToFile() {
       const text = editor.value;
-      const suggestedName = filenameInput.value.trim() || 'untitled.txt';
+      let suggestedName = filenameInput.value.trim() || 'untitled.txt';
 
       // Only save if content or filename changed
       if (text === lastSavedText && suggestedName === lastSavedFilename) {
@@ -42,17 +48,22 @@
 
       try {
         if (window.showSaveFilePicker) {
+          // Prompt only first time or after renaming in input
           if (!fileHandle) {
             const options = {
               suggestedName,
               types: [{ description: 'Text Files', accept: { 'text/plain': ['.txt'] } }],
             };
             fileHandle = await window.showSaveFilePicker(options);
+            // Update input to reflect actual selected filename
+            filenameInput.value = fileHandle.name;
+            suggestedName = fileHandle.name;
           }
           const writable = await fileHandle.createWritable();
           await writable.write(text);
           await writable.close();
         } else {
+          // Fallback: cannot detect changes in browser dialog
           const blob = new Blob([text], { type: 'text/plain' });
           const link = document.createElement('a');
           link.download = suggestedName;
