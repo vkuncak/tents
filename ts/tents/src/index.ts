@@ -9,7 +9,36 @@ const matrix: number[][] = Array.from(
   () => Array(SIZE).fill(0)
 );
 
-// 1.1 randomly place NumTrees values of 1 into distinct cells
+/**
+ * Checks if a tent can be placed at the given position.
+ * A tent can be placed if:
+ * - The position is within bounds.
+ * - The cell is empty (value is 0).
+ * - None of the 8 adjacent cells contain a tent (value is 3).
+ */
+function canPlaceTent(r: number, c: number): boolean {
+  // Ensure the position is within bounds and empty
+  if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || matrix[r][c] !== 0) {
+    return false;
+  }
+
+  // Check the 8 adjacent cells around the potential tent position
+  const adjacentCells = [
+    [r - 1, c - 1], [r - 1, c], [r - 1, c + 1], // Top-left, Top, Top-right
+    [r, c - 1],                 [r, c + 1],     // Left, Right
+    [r + 1, c - 1], [r + 1, c], [r + 1, c + 1], // Bottom-left, Bottom, Bottom-right
+  ];
+
+  return adjacentCells.every(([adjR, adjC]) => {
+    // Ensure adjacent cells are within bounds and do not contain a tent
+    return adjR < 0 || adjR >= SIZE || adjC < 0 || adjC >= SIZE || matrix[adjR][adjC] !== 3;
+  });
+}
+
+/**
+ * Places trees and tents in the matrix.
+ * Each tree (value 1) must have a tent (value 3) placed next to it.
+ */
 function placeTrees() {
   let treesPlaced = 0;
 
@@ -25,24 +54,7 @@ function placeTrees() {
         [row + 1, col], // Below
         [row, col - 1], // Left
         [row, col + 1], // Right
-      ].filter(([r, c]) => {
-        // Ensure the position is within bounds and empty
-        if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || matrix[r][c] !== 0) {
-          return false;
-        }
-
-        // Check the 8 adjacent cells around the potential tent position
-        const adjacentCells = [
-          [r - 1, c - 1], [r - 1, c], [r - 1, c + 1], // Top-left, Top, Top-right
-          [r, c - 1],                 [r, c + 1],     // Left, Right
-          [r + 1, c - 1], [r + 1, c], [r + 1, c + 1], // Bottom-left, Bottom, Bottom-right
-        ];
-
-        return adjacentCells.every(([adjR, adjC]) => {
-          // Ensure adjacent cells are within bounds and do not contain a tent
-          return adjR < 0 || adjR >= SIZE || adjC < 0 || adjC >= SIZE || matrix[adjR][adjC] !== 3;
-        });
-      });
+      ].filter(([r, c]) => canPlaceTent(r, c)); // Use the new function to check tent placement
 
       // If there is at least one valid position for a tent
       if (tentPositions.length > 0) {
@@ -61,7 +73,27 @@ function placeTrees() {
 // Call the function to place trees
 placeTrees();
 
-// 2. draw the matrix into the #matrix container
+/**
+ * Handles the click event for a cell.
+ * Updates the matrix value and redraws the matrix.
+ */
+function handleCellClick(row: number, col: number): void {
+  const val = matrix[row][col];
+  if (val === 0) {
+    matrix[row][col] = 2; // Change 0 to 2
+  } else if (val === 2) {
+    matrix[row][col] = 3; // Change 2 to 3
+  } else if (val === 3) {
+    matrix[row][col] = 0; // Change 3 to 0
+  } else {
+    return; // Do nothing for other values
+  }
+  drawMatrix(); // Redraw the matrix after the change
+}
+
+/**
+ * Draws the matrix and totals into the #matrix container.
+ */
 function drawMatrix() {
   const container = document.getElementById('matrix')!;
   container.innerHTML = ''; // Clear old content
@@ -95,47 +127,30 @@ function drawMatrix() {
       }
 
       // Add click event to update value and redraw
-      cell.addEventListener('click', () => {
-        if (val === 0) {
-          matrix[row][col] = 2; // Change 0 to 2
-        } else if (val === 2) {
-          matrix[row][col] = 3; // Change 2 to 3
-        } else if (val === 3) {
-          matrix[row][col] = 0; // Change 3 to 0
-        } else {
-          return; // Do nothing for other values
-        }
-        drawMatrix(); // Redraw the matrix after the change
-      });
+      cell.addEventListener('click', () => handleCellClick(row, col));
 
       container.appendChild(cell);
     }
 
     // Add a cell for the row total
     const rowTotalCell = document.createElement('div');
-    // Apply 'cell' for base grid layout and 'row-total' for specific total styling
     rowTotalCell.className = 'cell row-total'; 
     rowTotalCell.textContent = String(rowTotals[row]);
-    // No need for rowTotalCell.style.border = 'none'; if .row-total CSS handles it
     container.appendChild(rowTotalCell);
   }
 
   // Add a row for column totals
   for (let col = 0; col < SIZE; col++) {
     const colTotalCell = document.createElement('div');
-    // Apply 'cell' for base grid layout and 'col-total' for specific total styling
     colTotalCell.className = 'cell col-total'; 
     colTotalCell.textContent = String(colTotals[col]);
-    // No need for colTotalCell.style.border = 'none'; if .col-total CSS handles it
     container.appendChild(colTotalCell);
   }
 
   // Add an empty cell in the bottom-right corner
   const emptyCell = document.createElement('div');
-  // Apply 'cell' and one of the total classes (e.g., 'row-total' as they share styles)
   emptyCell.className = 'cell row-total'; 
   emptyCell.textContent = '';
-  // No need for emptyCell.style.border = 'none'; if .row-total CSS handles it
   container.appendChild(emptyCell);
 }
 
