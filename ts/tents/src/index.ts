@@ -154,9 +154,9 @@ function setupDynamicSizing(container: HTMLElement): number {
   const cellSize = Math.floor(actualWidth / (SIZE + 1)); // +1 for totals column
 
   // Calculate font sizes dynamically based on cell size
-  const cellFontSize = Math.floor(cellSize * 0.8); // Cell font is 60% of cell size
-  const totalFontSize = Math.floor(cellSize * 0.7); // Total font is 40% of cell size
-  const messageFontSize = Math.floor(cellSize); // Message font is 50% of cell size
+  const cellFontSize = Math.floor(cellSize * 0.8); // Cell font is 80% of cell size
+  const totalFontSize = Math.floor(cellSize * 0.5); // Total font is 50%
+  const messageFontSize = Math.floor(cellSize * 0.8); // Message font is 80%
 
   // Set the grid style dynamically
   container.style.gridTemplateColumns = `repeat(${SIZE + 1}, ${cellSize}px)`;
