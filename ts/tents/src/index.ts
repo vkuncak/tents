@@ -3,6 +3,28 @@
 const SIZE = 8;
 const NumTrees = (SIZE / 2) * (SIZE / 2 - 1); // Calculate the number of trees
 
+let rng: { random(): number };
+
+/**
+ * Seeds a simple LCG RNG so puzzles can be reproduced.
+ */
+function seedRng(initSeed: number): void {
+  // parameters from “Numerical Recipes”
+  let state = initSeed % 233280;
+  if (state <= 0) state += 233280;
+  rng = {
+    random(): number {
+      state = (state * 9301 + 49297) % 233280;
+      return state / 233280;
+    }
+  };
+}
+
+// read seed from URL ?seed=1234 or use current time
+const params = new URLSearchParams(window.location.search);
+const seed = params.has('id') ? parseInt(params.get('id')!, 10) : Date.now();
+seedRng(seed);
+
 // Initialize a SIZE × SIZE matrix filled with zeros
 const globalMatrix: number[][] = Array.from(
   { length: SIZE },
@@ -58,8 +80,8 @@ function placeTrees(matrix: number[][]): void {
   let treesPlaced = 0;
 
   while (treesPlaced < NumTrees) {
-    const row = Math.floor(Math.random() * SIZE);
-    const col = Math.floor(Math.random() * SIZE);
+    const row = Math.floor(rng.random() * SIZE);
+    const col = Math.floor(rng.random() * SIZE);
 
     if (matrix[row][col] === 0) {
       const tentPositions = [
@@ -70,7 +92,8 @@ function placeTrees(matrix: number[][]): void {
       ].filter(([r, c]) => canPlaceTent(matrix, r, c));
 
       if (tentPositions.length > 0) {
-        const [tentRow, tentCol] = tentPositions[Math.floor(Math.random() * tentPositions.length)];
+        const idx = Math.floor(rng.random() * tentPositions.length);
+        const [tentRow, tentCol] = tentPositions[idx];
         matrix[row][col] = 1; // Place the tree
         matrix[tentRow][tentCol] = 3; // Place the tent
         treesPlaced++;
@@ -284,6 +307,11 @@ window.addEventListener('resize', () => {
   drawMatrix(globalMatrix, solutionMatrix);
 });
 
+// optionally display the seed for reproducibility
+const messageEl = document.getElementById('seed');
+if (messageEl) {
+  messageEl.textContent = `Puzzle ID: ${seed}`;
+}
 // Initialize the matrix and render it
 placeTrees(globalMatrix);
 solutionMatrix = copyMatrix(globalMatrix); // Copy globalMatrix into solutionMatrix
