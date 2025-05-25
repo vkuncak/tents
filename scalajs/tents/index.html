@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tents: Recreation of Tents from Simon Tatham's Puzzles</title>
+  <style>
+    /* Fixed title size that never changes but scales appropriately */
+    h1 {
+      font-size: 2rem; /* Use rem units for better scaling */
+      margin: 20px 0;
+      text-align: center;
+      font-family: sans-serif;
+    }
+    
+    /* Default styles - will be overridden by JavaScript */
+    #matrix {
+      display: grid;
+      gap: 0; /* Remove the space between rows and columns */
+      margin: 20px auto; /* Center the matrix */
+    }
+    .cell {
+      border: 1px solid #666; /* Default border for cells */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: sans-serif;
+    }
+    .row-total, .col-total {
+      text-align: center;
+      border: none; /* Crucial: Remove the border for totals */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-message {
+      font-weight: bold; /* Make the text bold */
+      color: green; /* Optional: Add a color to make it stand out */
+      text-align: center; /* Center the message */
+      margin-top: 20px; /* Add some spacing above the message */
+    }
+  </style>
+</head>
+<body>
+  <h1>Tents: Recreation of Tents from Simon Tatham's Puzzles</h1>
+
+  <div id="matrix"></div>
+  <div id="message" class="success-message"></div>
+  <script src="./target/scala-3.3.0/tents-fastopt/main.js" defer></script>
+
+  <p>Click on a cell to toggle its state. The goal is to place tents around trees without violating the rules:</p>
+  <ul>
+    <li>Each tree must have exactly one tent adjacent to it (horizontally or vertically).</li>
+    <li>Tents cannot be adjacent to each other, even diagonally.</li>
+    <li>The number of tents in each row and column must match the given totals.</li>
+    <li>Empty cells can be left blank.</li>
+  </ul>
+</body>
+</html>
