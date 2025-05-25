@@ -154,14 +154,14 @@ function handleCellClick(matrix: number[][], row: number, col: number): void {
   drawMatrix(matrix, solutionMatrix); // Redraw the matrix after the change
 
   // Check if the current globalMatrix matches the solutionMatrix
+  const messageElement = document.getElementById('message');
   if (isCorrectSolution(matrix, solutionMatrix)) {
-    // Add the success message to the body or a parent container
-    const existingMessage = document.querySelector('.success-message');
-    if (!existingMessage) {
-      const successMessage = document.createElement('div');
-      successMessage.className = 'success-message';
-      successMessage.textContent = 'Congratulations! You solved the puzzle!';
-      document.body.appendChild(successMessage); // Append to the body
+    if (messageElement) {
+      messageElement.textContent = 'Congratulations! You solved the puzzle!';
+    }
+  } else {
+    if (messageElement) {
+      messageElement.textContent = 'Find positions of all tents!';
     }
   }
 }
