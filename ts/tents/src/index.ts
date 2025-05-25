@@ -80,28 +80,6 @@ function placeTrees(matrix: number[][]): void {
 }
 
 /**
- * Compares two matrices for equality.
- * @param matrix1 The first matrix to compare.
- * @param matrix2 The second matrix to compare.
- * @returns True if the matrices are equal, false otherwise.
- */
-function areMatricesEqual(matrix1: number[][], matrix2: number[][]): boolean {
-  if (matrix1.length !== matrix2.length) return false;
-
-  for (let row = 0; row < matrix1.length; row++) {
-    if (matrix1[row].length !== matrix2[row].length) return false;
-
-    for (let col = 0; col < matrix1[row].length; col++) {
-      if (matrix1[row][col] !== matrix2[row][col]) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-/**
  * Checks if the current matrix matches the solution matrix.
  * Treats values 0 and 2 as equal.
  * @param matrix The current matrix (globalMatrix).
