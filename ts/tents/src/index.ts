@@ -133,35 +133,92 @@ function handleCellClick(matrix: number[][], row: number, col: number): void {
 
   // Check if the current globalMatrix matches the solutionMatrix
   const messageElement = document.getElementById('message');
-  if (isCorrectSolution(matrix, solutionMatrix)) {
-    if (messageElement) {
-      messageElement.textContent = 'Congratulations! You solved the puzzle!';
-    }
-  } else {
-    if (messageElement) {
-      messageElement.textContent = 'Find positions of all tents!';
+  if (messageElement) {
+    if (isCorrectSolution(matrix, solutionMatrix)) {
+      messageElement.textContent = 'Puzzle solved!';
+    } else {
+      messageElement.textContent = 'Find all tents!';
     }
   }
 }
 
 /**
- * Draws the matrix and totals into the #matrix container.
- * @param matrix The matrix to render (globalMatrix).
- * @param solutionMatrix The matrix used to calculate totals.
+ * Sets up dynamic sizing for the matrix and its elements.
+ * @param container The matrix container element
+ * @returns The calculated cell size
  */
-function drawMatrix(matrix: number[][], solutionMatrix: number[][]): void {
-  const container = document.getElementById('matrix')!;
-  container.innerHTML = ''; // Clear old content
+function setupDynamicSizing(container: HTMLElement): number {
+  // Calculate cell size dynamically based on container width
+  const containerWidth = window.innerWidth * 0.9; // 90% of viewport width
+  const actualWidth = containerWidth; // Remove maxWidth constraint
+  const cellSize = Math.floor(actualWidth / (SIZE + 1)); // +1 for totals column
 
-  // Compute totals for rows and columns based on the solutionMatrix
+  // Calculate font sizes dynamically based on cell size
+  const cellFontSize = Math.floor(cellSize * 0.8); // Cell font is 60% of cell size
+  const totalFontSize = Math.floor(cellSize * 0.7); // Total font is 40% of cell size
+  const messageFontSize = Math.floor(cellSize); // Message font is 50% of cell size
+
+  // Set the grid style dynamically
+  container.style.gridTemplateColumns = `repeat(${SIZE + 1}, ${cellSize}px)`;
+  container.style.width = `${cellSize * (SIZE + 1)}px`;
+
+  // Remove any existing dynamic styles
+  const existingStyle = document.getElementById('dynamic-styles');
+  if (existingStyle) {
+    existingStyle.remove();
+  }
+
+  // Set cell dimensions and font sizes dynamically
+  const style = document.createElement('style');
+  style.id = 'dynamic-styles';
+  style.textContent = `
+    .cell {
+      width: ${cellSize}px;
+      height: ${cellSize}px;
+      font-size: ${cellFontSize}px;
+    }
+    .row-total, .col-total {
+      width: ${cellSize}px;
+      height: ${cellSize}px;
+      font-size: ${totalFontSize}px;
+      line-height: ${cellSize}px;
+    }
+    .success-message {
+      font-size: ${messageFontSize}px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  return cellSize;
+}
+
+/**
+ * Computes the totals for rows and columns based on the solution matrix.
+ * @param solutionMatrix The solution matrix used to calculate totals
+ * @returns An object containing rowTotals and colTotals arrays
+ */
+function computeTotals(solutionMatrix: number[][]): { rowTotals: number[], colTotals: number[] } {
   const rowTotals = solutionMatrix.map(row => row.filter(val => val === 3).length);
   const colTotals = Array(SIZE).fill(0).map((_, col) =>
     solutionMatrix.reduce((sum, row) => sum + (row[col] === 3 ? 1 : 0), 0)
   );
 
-  // Set the grid style dynamically based on SIZE + 1 (for totals)
-  container.style.gridTemplateColumns = `repeat(${SIZE + 1}, 40px)`; // +1 for totals column
+  return { rowTotals, colTotals };
+}
 
+/**
+ * Displays the main content of the matrix (trees, tents, and empty cells).
+ * @param container The matrix container element
+ * @param matrix The current matrix to display
+ * @param rowTotals Array of row totals
+ * @param colTotals Array of column totals
+ */
+function displayMatrixContent(
+  container: HTMLElement, 
+  matrix: number[][], 
+  rowTotals: number[], 
+  colTotals: number[]
+): void {
   for (let row = 0; row < SIZE; row++) {
     for (let col = 0; col < SIZE; col++) {
       const cell = document.createElement('div');
@@ -207,6 +264,25 @@ function drawMatrix(matrix: number[][], solutionMatrix: number[][]): void {
   emptyCell.textContent = '';
   container.appendChild(emptyCell);
 }
+
+/**
+ * Draws the matrix and totals into the #matrix container.
+ * @param matrix The matrix to render (globalMatrix).
+ * @param solutionMatrix The matrix used to calculate totals.
+ */
+function drawMatrix(matrix: number[][], solutionMatrix: number[][]): void {
+  const container = document.getElementById('matrix')!;
+  container.innerHTML = ''; // Clear old content
+
+  setupDynamicSizing(container);
+  const { rowTotals, colTotals } = computeTotals(solutionMatrix);
+  displayMatrixContent(container, matrix, rowTotals, colTotals);
+}
+
+// Add window resize listener to redraw matrix when screen orientation changes
+window.addEventListener('resize', () => {
+  drawMatrix(globalMatrix, solutionMatrix);
+});
 
 // Initialize the matrix and render it
 placeTrees(globalMatrix);
