@@ -73,16 +73,15 @@ function canPlaceTent(matrix: number[][], r: number, c: number): boolean {
   });
 }
 
-/**
- * Places trees and tents in the matrix.
- */
+// Places trees and tents in the matrix.
 function placeTrees(matrix: number[][]): void {
+  const maxAttempts = 10000;
   let treesPlaced = 0;
-
-  while (treesPlaced < NumTrees) {
+  let attempts = 0;
+  while (treesPlaced < NumTrees && attempts < maxAttempts) {
     const row = Math.floor(rng.random() * SIZE);
     const col = Math.floor(rng.random() * SIZE);
-
+    attempts++;
     if (matrix[row][col] === 0) {
       const tentPositions = [
         [row - 1, col],
