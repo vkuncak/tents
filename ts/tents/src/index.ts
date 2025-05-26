@@ -5,6 +5,9 @@ const NumTrees = (SIZE / 2) * (SIZE / 2 - 1); // Calculate the number of trees
 
 let rng: { random(): number };
 
+// Global reference for the game message element, initialized in DOMContentLoaded
+let messageElement: HTMLElement | null = null;
+
 /**
  * Seeds a simple LCG RNG so puzzles can be reproduced.
  */
@@ -154,7 +157,6 @@ function handleCellClick(matrix: number[][], row: number, col: number): void {
   drawMatrix(matrix, solutionMatrix); // Redraw the matrix after the change
 
   // Check if the current globalMatrix matches the solutionMatrix
-  const messageElement = document.getElementById('message');
   if (messageElement) {
     if (isCorrectSolution(matrix, solutionMatrix)) {
       messageElement.textContent = 'Puzzle solved!';
@@ -301,20 +303,63 @@ function drawMatrix(matrix: number[][], solutionMatrix: number[][]): void {
   displayMatrixContent(container, matrix, rowTotals, colTotals);
 }
 
-// Add window resize listener to redraw matrix when screen orientation changes
-window.addEventListener('resize', () => {
-  drawMatrix(globalMatrix, solutionMatrix);
+/**
+ * Handles the click event for the "Clear" button.
+ * Resets all non-tree cells in the globalMatrix to 0.
+ */
+function handleClearButtonClick(): void {
+  for (let row = 0; row < SIZE; row++) {
+    for (let col = 0; col < SIZE; col++) {
+      if (globalMatrix[row][col] !== 1) { // If it's not a tree (value 1)
+        globalMatrix[row][col] = 0;     // Clear it (tent or 'x' mark)
+      }
+    }
+  }
+  drawMatrix(globalMatrix, solutionMatrix); // Redraw the cleared matrix
+
+  // Reset the game message
+  if (messageElement) {
+    messageElement.textContent = 'Find all tents!';
+  }
+}
+
+// --- DOMContentLoaded: Initialization and Event Binding ---
+document.addEventListener('DOMContentLoaded', () => {
+  // Display seed
+  const seedDisplayElement = document.getElementById('seed');
+  if (seedDisplayElement) {
+    seedDisplayElement.textContent = `Puzzle ID: ${seed}`;
+  } else {
+    console.error('Seed display element with id="seed" not found!');
+  }
+
+  // Get message element reference and set initial text
+  messageElement = document.getElementById('message');
+  if (messageElement) {
+    messageElement.textContent = 'Find all tents!';
+  } else {
+    console.error('Message element with id="message" not found!');
+  }
+
+  // Setup Clear Button
+  const clearButton = document.getElementById('clearButton');
+  if (clearButton) {
+    clearButton.addEventListener('click', handleClearButtonClick);
+  } else {
+    console.error('Clear button with id="clearButton" not found!');
+  }
+  
+  // Initialize and draw the game board
+  placeTrees(globalMatrix); // Populate globalMatrix with a solution (trees and tents)
+  solutionMatrix = copyMatrix(globalMatrix); // Store the complete solution
+  eraseTents(globalMatrix); // Clear tents from globalMatrix for the player to start
+  drawMatrix(globalMatrix, solutionMatrix); // Initial render of the game
 });
 
-// optionally display the seed for reproducibility
-const messageEl = document.getElementById('seed');
-if (messageEl) {
-  messageEl.textContent = `Puzzle ID: ${seed}`;
-}
-// Initialize the matrix and render it
-placeTrees(globalMatrix);
-solutionMatrix = copyMatrix(globalMatrix); // Copy globalMatrix into solutionMatrix
-eraseTents(globalMatrix); // Remove all tents from globalMatrix
-document.addEventListener('DOMContentLoaded', () => {
-  drawMatrix(globalMatrix, solutionMatrix);
+// Add window resize listener to redraw matrix when screen orientation changes
+window.addEventListener('resize', () => {
+  // Ensure globalMatrix and solutionMatrix are initialized before calling drawMatrix
+  if (globalMatrix.length > 0 && solutionMatrix.length > 0) {
+    drawMatrix(globalMatrix, solutionMatrix);
+  }
 });

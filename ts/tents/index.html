@@ -40,6 +40,19 @@
       text-align: center; /* Center the message */
       margin-top: 20px; /* Add some spacing above the message */
     }
+    #clearButton { /* Style for the new button */
+      display: block; /* Allows margin auto to center it */
+      margin: 15px 0; /* Adds space above/below and centers it */
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f8f8;
+    }
+    #clearButton:hover {
+      background-color: #e8e8e8;
+    }
   </style>
 </head>
 <body>
@@ -47,6 +60,7 @@
 
   <div id="seed"></div>
   <div id="matrix"></div>
+  <button id="clearButton">Clear</button>
   <div id="message" class="success-message"></div>
   <script src="./dist/index.js" defer></script>
 
