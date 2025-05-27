@@ -129,6 +129,13 @@ function isCorrectSolution(matrix: number[][], solutionMatrix: number[][]): bool
         continue;
       }
 
+      if (
+        (currentVal === 1 || currentVal === 4) &&
+        (solutionVal === 1 || solutionVal === 4)
+      ) {
+        continue;
+      }
+
       // Check for exact match for other values
       if (currentVal !== solutionVal) {
         return false;
@@ -144,12 +151,17 @@ function isCorrectSolution(matrix: number[][], solutionMatrix: number[][]): bool
  */
 function handleCellClick(matrix: number[][], row: number, col: number): void {
   const val = matrix[row][col];
+  // two cycles: 0 -> 2 -> 3 -> 0; 1 -> 4
   if (val === 0) {
-    matrix[row][col] = 2; // Change 0 to 2
+    matrix[row][col] = 2;
   } else if (val === 2) {
-    matrix[row][col] = 3; // Change 2 to 3
+    matrix[row][col] = 3;
   } else if (val === 3) {
-    matrix[row][col] = 0; // Change 3 to 0
+    matrix[row][col] = 0;
+  } else if (val === 1) {
+    matrix[row][col] = 4;
+  } else if (val == 4) {
+    matrix[row][col] = 1;
   } else {
     return; // Do nothing for other values
   }
@@ -258,6 +270,8 @@ function displayMatrixContent(
         cell.textContent = '×'; // Multiplication Sign Unicode character
       } else if (val === 3) {
         cell.textContent = '⛺'; // Tent Unicode character
+      } else if (val === 4) {
+        cell.textContent = '🌳⃰';
       } else {
         cell.textContent = String(val);
       }
