@@ -22,11 +22,11 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        working-directory: ts
+        working-directory: ts/tents
         run: npm install
 
       - name: Run compile.sh
-        working-directory: ts
+        working-directory: ts/tents
         run: |
           chmod +x compile.sh
           ./compile.sh
