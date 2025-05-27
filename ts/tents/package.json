@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@typescript/native-preview": "^7.0.0-dev.20250523.1",
     "typescript": "^4.9.5"
   }
 }
